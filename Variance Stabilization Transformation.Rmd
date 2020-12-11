@@ -1,0 +1,67 @@
+---
+title: "M2_Hasib Noor Shahdin_2020_3_82_004"
+author: "Hasib Noor Shadhin"
+date: "12/11/2020"
+output: word_document
+---
+
+```{r}
+getwd()
+setwd("G:/EWU/02 Semester 1/01 Analysis of Variance/R Classwork/Mid Term 2")
+install.packages("outliers")
+library(outliers)
+install.packages("nonpar")
+library(nonpar)
+install.packages("GAD")
+library(GAD)
+```
+
+```{r}
+dat <- read.csv("mid2 data.csv")
+str(dat)
+```
+
+# Cochran's Test
+```{r}
+cochrans.q(dat)
+cochran.test(dat$Obs,c(6,6,6,6), inlying = TRUE)
+```
+Since p-value is less than 0.05, we can conclude that the equal variance assumption does not hold.
+
+# Transformation
+```{r}
+sigmayi <- tapply(dat$Obs, dat$Method, sd)
+sigmayi
+mui <- tapply(dat$Obs, dat$Method, mean)
+mui
+logsigmayi <- log(sigmayi)
+logsigmayi
+logmui <- log(mui)
+logmui
+```
+
+## Plotting logsigmayi against logmui and finding coefficeint
+```{r}
+plot(logsigmayi, logmui, type = "l")
+lm(logsigmayi~logmui)
+```
+The coefficient of logmui is 0.9644. This value is approximately 1. So, we will have to use log transformation.
+
+# Checking for equal variance in the transformed data
+```{r}
+dat1 <- read.csv("mid2 data.csv")
+str(dat1)
+```
+
+## Using Bartlett's Test
+```{r}
+bartlett.test(Obs1~Method, data = dat1)
+```
+Since p-value is greater than 0.05 we cannot reject the null hypothesis. Thus, the variances are equal.
+
+# Testing whether different methods differ
+```{r}
+anv1 <- aov(Obs1~Method, data = dat1)
+summary(anv1)
+```
+Since p-value is less than 0.05, we can conclude that the mean of the different treatments are not equal.
